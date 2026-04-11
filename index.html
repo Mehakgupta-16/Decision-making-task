@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Loss Aversion Experiment</title>
+    <style>
+        /* ── Reset & Base ──────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue-50:  #E3F2FD;
+            --blue-100: #BBDEFB;
+            --blue-200: #90CAF9;
+            --blue-400: #42A5F5;
+            --blue-600: #1E88E5;
+            --blue-700: #1565C0;
+            --blue-800: #1255A1;
+            --blue-900: #0D47A1;
+            --green:    #2E7D32;
+            --red:      #C62828;
+            --gray-50:  #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-300: #E0E0E0;
+            --gray-500: #9E9E9E;
+            --gray-700: #616161;
+            --gray-900: #212121;
+            --radius:   12px;
+            --shadow:   0 4px 20px rgba(0,0,0,.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--blue-50);
+            color: var(--gray-900);
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        /* ── App Container ─────────────────────────────────── */
+        #app {
+            width: 100%;
+            max-width: 480px;
+            min-height: calc(100dvh - 32px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            animation: fadeIn .3s ease;
+        }
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Card ──────────────────────────────────────────── */
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px 24px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Typography ────────────────────────────────────── */
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-900);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--blue-800);
+            margin-bottom: 12px;
+        }
+        p, li {
+            font-size: .95rem;
+            line-height: 1.6;
+            color: var(--gray-700);
+        }
+        ul { padding-left: 20px; margin-bottom: 12px; }
+        li { margin-bottom: 4px; }
+
+        .subtitle {
+            font-size: .9rem;
+            color: var(--gray-500);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* ── Buttons ───────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .1s, box-shadow .2s;
+            -webkit-tap-highlight-color: transparent;
+            width: 100%;
+        }
+        .btn:active { transform: scale(.97); }
+
+        .btn-primary {
+            background: var(--blue-700);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(21,101,192,.35);
+        }
+        .btn-primary:hover { background: var(--blue-800); }
+
+        .btn-accept {
+            background: var(--green);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(46,125,50,.3);
+        }
+        .btn-reject {
+            background: var(--red);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(198,40,40,.3);
+        }
+
+        .btn-lang {
+            background: #fff;
+            color: var(--blue-700);
+            border: 2px solid var(--blue-200);
+            font-size: 1.1rem;
+            padding: 18px;
+            border-radius: var(--radius);
+        }
+        .btn-lang:hover { border-color: var(--blue-600); background: var(--blue-50); }
+        .btn-lang:active { background: var(--blue-100); }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-row .btn { flex: 1; }
+
+        /* ── Progress Dots ─────────────────────────────────── */
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 16px 0;
+        }
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--blue-200);
+            transition: all .3s ease;
+        }
+        .dot.completed { background: var(--blue-700); }
+        .dot.current   {
+            background: var(--blue-600);
+            transform: scale(1.4);
+            box-shadow: 0 0 0 3px rgba(30,136,229,.25);
+        }
+
+        /* ── Trial Boxes ───────────────────────────────────── */
+        .trial-header {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: .85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+        }
+
+        .scenario-text {
+            text-align: center;
+            font-size: .95rem;
+            color: var(--gray-700);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .outcome-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .outcome-box {
+            flex: 1;
+            border-radius: var(--radius);
+            padding: 20px 12px;
+            text-align: center;
+        }
+        .outcome-box.gain {
+            background: #E8F5E9;
+            border: 2px solid #A5D6A7;
+        }
+        .outcome-box.loss {
+            background: #FFEBEE;
+            border: 2px solid #EF9A9A;
+        }
+        .outcome-label {
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px;
+        }
+        .gain .outcome-label { color: var(--green); }
+        .loss .outcome-label { color: var(--red); }
+
+        .outcome-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .gain .outcome-amount { color: var(--green); }
+        .loss .outcome-amount { color: var(--red); }
+
+        .coin-icon {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        /* ── Form Elements ─────────────────────────────────── */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--gray-900);
+            background: #fff;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--blue-600);
+            box-shadow: 0 0 0 3px rgba(30,136,229,.15);
+        }
+        .form-group .error-msg {
+            color: var(--red);
+            font-size: .8rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* ── Results ───────────────────────────────────────── */
+        .lambda-display {
+            text-align: center;
+            padding: 24px 0;
+        }
+        .lambda-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--blue-700);
+            line-height: 1;
+        }
+        .lambda-suffix {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            display: block;
+            margin-top: 4px;
+        }
+        .lambda-label {
+            font-size: .85rem;
+            color: var(--gray-500);
+            margin-top: 8px;
+        }
+
+        .result-interpretation {
+            background: var(--blue-50);
+            border-left: 4px solid var(--blue-600);
+            border-radius: 0 8px 8px 0;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .result-interpretation p {
+            font-size: .92rem;
+            color: var(--gray-700);
+        }
+
+        /* ── Misc ──────────────────────────────────────────── */
+        .spacer  { flex: 1; }
+        .mt-auto { margin-top: auto; }
+        .mb-12   { margin-bottom: 12px; }
+        .text-center { text-align: center; }
+
+        .footer-note {
+            text-align: center;
+            font-size: .75rem;
+            color: var(--gray-500);
+            padding: 16px 0 8px;
+        }
+
+        /* ── Responsive tweaks for larger viewports ────────── */
+        @media (min-width: 600px) {
+            body { align-items: center; }
+            #app { min-height: auto; }
+            .card { padding: 36px 32px; }
+            h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+
+    <!-- ═══════ SCREEN 1 — Language Selection ═══════ -->
+    <div id="screen-language" class="screen active">
+        <div class="spacer"></div>
+        <div class="card text-center">
+            <h1 id="lang-title">&#x1F9E0; Cognitive Experiment</h1>
+            <p class="subtitle" id="lang-subtitle">Select your preferred language</p>
+            <button class="btn btn-lang mb-12" onclick="setLanguage('en')">English</button>
+            <button class="btn btn-lang" onclick="setLanguage('hi')">हिंदी</button>
+        </div>
+        <div class="spacer"></div>
+        <p class="footer-note">Your data is anonymous and used for research only.</p>
+    </div>
+
+    <!-- ═══════ SCREEN 2 — Instructions ═══════ -->
+    <div id="screen-instructions" class="screen">
+        <div class="card">
+            <h1 data-i18n="instructions_title">Instructions</h1>
+            <p data-i18n="instructions_p1" style="margin-bottom:12px;">
+                In this experiment, you will face a series of <strong>9 coin-toss gambles</strong>.
+            </p>
+            <p data-i18n="instructions_p2" style="margin-bottom:12px;">
+                For each gamble, imagine a <strong>fair coin</strong> is tossed:
+            </p>
+            <ul>
+                <li data-i18n="instructions_li1">If the coin lands <strong>Heads</strong>, you <strong>win</strong> a certain amount of money.</li>
+                <li data-i18n="instructions_li2">If the coin lands <strong>Tails</strong>, you <strong>lose</strong> a certain amount of money.</li>
+            </ul>
+            <p data-i18n="instructions_p3" style="margin-bottom:12px;">
+                For each gamble, you must decide whether to <strong>Accept</strong> (play the gamble) or <strong>Reject</strong> (skip it).
+            </p>
+            <p data-i18n="instructions_p4" style="margin-bottom:12px;">
+                There are no right or wrong answers. We are interested in your <strong>gut feeling</strong> — please respond as quickly and honestly as you can.
+            </p>
+            <p data-i18n="instructions_p5">
+                The experiment takes about <strong>2–3 minutes</strong>.
+            </p>
+        </div>
+        <div class="mt-auto" style="padding-bottom:16px;">
+            <button class="btn btn-primary" onclick="startTrials()" data-i18n="start_experiment">Start Experiment</button>
+        </div>
+    </div>
+
+    <!-- ═══════ SCREEN 3 — Trials ═══════ -->
+    <div id="screen-trial" class="screen">
+        <div class="progress-dots" id="progress-dots"></div>
+        <div class="card">
+            <p class="trial-header" id="trial-label">Trial 1 of 9</p>
+            <p class="scenario-text" data-i18n="scenario_text" id="scenario-text">
+                A fair coin is tossed. Do you accept this gamble?
+            </p>
+            <div class="outcome-row" id="outcome-row">
+                <!-- Gain & Loss boxes rendered dynamically -->
+            </div>
+            <div class="btn-row" id="btn-row">
+                <!-- Accept & Reject rendered dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ SCREEN 4 — Demographics ═══════ -->
+    <div id="screen-demographics" class="screen">
+        <div class="card">
+            <h1 data-i18n="demo_title">Almost Done!</h1>
+            <p class="subtitle" data-i18n="demo_subtitle">Please tell us a little about yourself.</p>
+
+            <div class="form-group">
+                <label for="input-age" data-i18n="demo_age_label">Age</label>
+                <input type="number" id="input-age" min="10" max="100" placeholder="e.g. 25" inputmode="numeric">
+                <span class="error-msg" id="err-age" data-i18n="demo_age_error">Please enter a valid age (10–100).</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-gender" data-i18n="demo_gender_label">Gender</label>
+                <select id="input-gender">
+                    <option value="" disabled selected data-i18n="demo_gender_placeholder">Select…</option>
+                    <option value="male"   data-i18n="demo_gender_male">Male</option>
+                    <option value="female" data-i18n="demo_gender_female">Female</option>
+                    <option value="other"  data-i18n="demo_gender_other">Other</option>
+                </select>
+                <span class="error-msg" id="err-gender" data-i18n="demo_gender_error">Please select your gender.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-income" data-i18n="demo_income_label">Monthly Income</label>
+                <select id="input-income">
+                    <option value="" disabled selected data-i18n="demo_income_placeholder">Select…</option>
+                    <option value="<50k"        data-i18n="demo_income_1">&lt; ₹50,000</option>
+                    <option value="50k-1.5L"    data-i18n="demo_income_2">₹50,000 – ₹1,50,000</option>
+                    <option value="1.5L-3L"     data-i18n="demo_income_3">₹1,50,000 – ₹3,00,000</option>
+                    <option value=">3L"         data-i18n="demo_income_4">&gt; ₹3,00,000</option>
+                </select>
+                <span class="error-msg" id="err-income" data-i18n="demo_income_error">Please select your income range.</span>
+            </div>
+        </div>
+        <div class="mt-auto" style="padding-bottom:16px;">
+            <button class="btn btn-primary" onclick="submitDemographics()" data-i18n="demo_submit">Submit</button>
+        </div>
+    </div>
+
+    <!-- ═══════ SCREEN 5 — Results ═══════ -->
+    <div id="screen-results" class="screen">
+        <div class="card">
+            <h1 data-i18n="results_title">Your Results</h1>
+            <div class="lambda-display">
+                <span class="lambda-value" id="lambda-value">—</span>
+                <span class="lambda-suffix" data-i18n="results_suffix">times stronger</span>
+                <p class="lambda-label" id="lambda-headline" data-i18n="results_headline">
+                    You experience losses <strong id="lambda-inline">—</strong> times stronger than gains.
+                </p>
+            </div>
+            <div class="result-interpretation">
+                <p id="interpretation-text">—</p>
+            </div>
+            <p class="footer-note" style="margin-top:20px;" data-i18n="results_note">
+                The average person experiences losses about <strong>2–2.5×</strong> stronger than equivalent gains (Kahneman & Tversky, 1979).
+            </p>
+        </div>
+        <p class="footer-note" data-i18n="results_thanks">Thank you for participating! You may close this page.</p>
+    </div>
+
+</div><!-- /app -->
+
+
+<script>
+/* ╔═══════════════════════════════════════════════════════════╗
+   ║           LOSS AVERSION EXPERIMENT — LOGIC               ║
+   ╚═══════════════════════════════════════════════════════════╝ */
+
+// ─── i18n Dictionary ─────────────────────────────────────────
+// Swap in Hindi strings here. Every key used in the HTML has a
+// corresponding data-i18n attribute.
+const LANG = {
+    en: {
+        instructions_title:     "Instructions",
+        instructions_p1:        'In this experiment, you will face a series of <strong>9 coin-toss gambles</strong>.',
+        instructions_p2:        'For each gamble, imagine a <strong>fair coin</strong> is tossed:',
+        instructions_li1:       'If the coin lands <strong>Heads</strong>, you <strong>win</strong> a certain amount of money.',
+        instructions_li2:       'If the coin lands <strong>Tails</strong>, you <strong>lose</strong> a certain amount of money.',
+        instructions_p3:        'For each gamble, you must decide whether to <strong>Accept</strong> (play the gamble) or <strong>Reject</strong> (skip it).',
+        instructions_p4:        'There are no right or wrong answers. We are interested in your <strong>gut feeling</strong> — please respond as quickly and honestly as you can.',
+        instructions_p5:        'The experiment takes about <strong>2–3 minutes</strong>.',
+        start_experiment:       "Start Experiment",
+        scenario_text:          "A fair coin is tossed. Do you accept this gamble?",
+        trial_label:            "Trial {n} of 16",
+        gain_label:             "HEADS — YOU WIN",
+        loss_label:             "TAILS — YOU LOSE",
+        btn_accept:             "Accept",
+        btn_reject:             "Reject",
+        demo_title:             "Almost Done!",
+        demo_subtitle:          "Please tell us a little about yourself.",
+        demo_age_label:         "Age",
+        demo_age_error:         "Please enter a valid age (10–100).",
+        demo_gender_label:      "Gender",
+        demo_gender_placeholder:"Select…",
+        demo_gender_male:       "Male",
+        demo_gender_female:     "Female",
+        demo_gender_other:      "Other",
+        demo_gender_error:      "Please select your gender.",
+        demo_income_label:      "Monthly Income",
+        demo_income_placeholder:"Select…",
+        demo_income_1:          "< ₹50,000",
+        demo_income_2:          "₹50,000 – ₹1,50,000",
+        demo_income_3:          "₹1,50,000 – ₹3,00,000",
+        demo_income_4:          "> ₹3,00,000",
+        demo_income_error:      "Please select your income range.",
+        demo_pid_label:          "Participant ID",
+        demo_pid_placeholder:   "Enter your participant ID",
+        demo_submit:            "Submit",
+        results_title:          "Your Results",
+        results_suffix:         "times stronger",
+        results_headline:       'You experience losses <strong id="lambda-inline">—</strong> times stronger than gains.',
+        results_note:           'The average person experiences losses about <strong>2–2.5×</strong> stronger than equivalent gains (Kahneman &amp; Tversky, 1979).',
+        results_thanks:         "Thank you for participating! You may close this page.",
+        // Interpretation brackets (tweak wording here)
+        interp_low:             "Your responses suggest you are roughly <strong>loss-neutral</strong>. Potential losses do not weigh much more heavily than equivalent gains for you. You may be comfortable with risk or evaluate outcomes fairly symmetrically.",
+        interp_mild:            "You show a <strong>mild degree of loss aversion</strong>. Losses sting a bit more than equivalent gains feel good, but you are still relatively comfortable accepting moderate risks.",
+        interp_moderate:        "You display <strong>moderate loss aversion</strong> — close to the average person. Losses feel noticeably more painful than equivalent gains feel pleasurable, which is the most common human pattern.",
+        interp_high:            "You exhibit <strong>strong loss aversion</strong>. Losses feel significantly more impactful to you than equivalent gains. You likely prefer certainty and may avoid risks even when the expected payoff is positive.",
+        interp_very_high:       "You show <strong>very strong loss aversion</strong>. You are highly sensitive to potential losses and strongly prefer to avoid them, even when the potential gain is substantially larger."
+    },
+    hi: {
+        // ── Hindi placeholders — replace these with actual translations ──
+        instructions_title:     "निर्देश",
+        instructions_p1:        'इस प्रयोग में, आपको <strong>9 सिक्का-उछाल जुआ</strong> का सामना करना होगा।',
+        instructions_p2:        'प्रत्येक जुए के लिए, कल्पना करें कि एक <strong>निष्पक्ष सिक्का</strong> उछाला जाता है:',
+        instructions_li1:       'यदि सिक्का <strong>चित</strong> आता है, तो आप एक निश्चित राशि <strong>जीतते</strong> हैं।',
+        instructions_li2:       'यदि सिक्का <strong>पट</strong> आता है, तो आप एक निश्चित राशि <strong>खोते</strong> हैं।',
+        instructions_p3:        'प्रत्येक जुए के लिए, आपको तय करना होगा कि <strong>स्वीकार</strong> (जुआ खेलें) या <strong>अस्वीकार</strong> (छोड़ दें)।',
+        instructions_p4:        'कोई सही या गलत उत्तर नहीं है। हमें आपकी <strong>सहज भावना</strong> में रुचि है — कृपया जितनी जल्दी और ईमानदारी से हो सके उत्तर दें।',
+        instructions_p5:        'प्रयोग में लगभग <strong>2-3 मिनट</strong> लगते हैं।',
+        start_experiment:       "प्रयोग शुरू करें",
+        scenario_text:          "एक निष्पक्ष सिक्का उछाला जाता है। क्या आप इस जुए को स्वीकार करते हैं?",
+        trial_label:            "परीक्षण {n} / 16",
+        gain_label:             "चित — आप जीतते हैं",
+        loss_label:             "पट — आप खोते हैं",
+        btn_accept:             "स्वीकार",
+        btn_reject:             "अस्वीकार",
+        demo_title:             "लगभग हो गया!",
+        demo_subtitle:          "कृपया अपने बारे में थोड़ा बताएं।",
+        demo_age_label:         "आयु",
+        demo_age_error:         "कृपया एक मान्य आयु दर्ज करें (10–100)।",
+        demo_gender_label:      "लिंग",
+        demo_gender_placeholder:"चुनें…",
+        demo_gender_male:       "पुरुष",
+        demo_gender_female:     "महिला",
+        demo_gender_other:      "अन्य",
+        demo_gender_error:      "कृपया अपना लिंग चुनें।",
+        demo_income_label:      "मासिक आय",
+        demo_income_placeholder:"चुनें…",
+        demo_income_1:          "< ₹50,000",
+        demo_income_2:          "₹50,000 – ₹1,50,000",
+        demo_income_3:          "₹1,50,000 – ₹3,00,000",
+        demo_income_4:          "> ₹3,00,000",
+        demo_income_error:      "कृपया अपनी आय सीमा चुनें।",
+        demo_pid_label:          "प्रतिभागी आईडी",
+        demo_pid_placeholder:   "अपनी प्रतिभागी आईडी दर्ज करें",
+        demo_submit:            "जमा करें",
+        results_title:          "आपके परिणाम",
+        results_suffix:         "गुना अधिक मजबूत",
+        results_headline:       'आप नुकसान को लाभ से <strong id="lambda-inline">—</strong> गुना अधिक मजबूती से अनुभव करते हैं।',
+        results_note:           'औसत व्यक्ति समकक्ष लाभ की तुलना में नुकसान को लगभग <strong>2–2.5×</strong> अधिक मजबूती से अनुभव करता है (Kahneman &amp; Tversky, 1979)।',
+        results_thanks:         "भाग लेने के लिए धन्यवाद! आप इस पेज को बंद कर सकते हैं।",
+        interp_low:             "आपकी प्रतिक्रियाएँ बताती हैं कि आप लगभग <strong>नुकसान-तटस्थ</strong> हैं। संभावित नुकसान आपके लिए समकक्ष लाभ से बहुत अधिक भारी नहीं होता।",
+        interp_mild:            "आप <strong>हल्की हानि-विमुखता</strong> दिखाते हैं। नुकसान समकक्ष लाभ से थोड़ा अधिक चुभता है, लेकिन आप मध्यम जोखिम स्वीकार करने में सहज हैं।",
+        interp_moderate:        "आप <strong>मध्यम हानि-विमुखता</strong> प्रदर्शित करते हैं — औसत व्यक्ति के करीब। नुकसान समकक्ष लाभ से काफी अधिक दर्दनाक लगता है।",
+        interp_high:            "आप <strong>मजबूत हानि-विमुखता</strong> दिखाते हैं। नुकसान आपके लिए समकक्ष लाभ से काफी अधिक प्रभावशाली लगता है।",
+        interp_very_high:       "आप <strong>बहुत मजबूत हानि-विमुखता</strong> दिखाते हैं। आप संभावित नुकसान के प्रति अत्यधिक संवेदनशील हैं।"
+    }
+};
+
+// ─── State ────────────────────────────────────────────────────
+let currentLang   = 'en';
+let participantId = generateId();
+let trials        = [];      // the 9 trial configs (shuffled)
+let trialResults  = [];      // collected responses
+let currentTrial  = 0;
+let trialStartTs  = 0;       // for reaction-time measurement
+
+// ─── Helpers ──────────────────────────────────────────────────
+function generateId() {
+    // Timestamp + 6-char random alphanum
+    const ts  = Date.now().toString(36);
+    const rnd = Math.random().toString(36).substring(2, 8);
+    return ts + '-' + rnd;
+}
+
+/** Fisher–Yates shuffle (in-place) */
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function t(key) { return LANG[currentLang][key] || LANG['en'][key] || key; }
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// ─── Language Selection ───────────────────────────────────────
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang === 'hi' ? 'hi' : 'en';
+    applyTranslations();
+    showScreen('screen-instructions');
+}
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const val = t(key);
+        if (el.tagName === 'INPUT') {
+            el.placeholder = val;
+        } else if (el.tagName === 'OPTION' || el.tagName === 'BUTTON') {
+            el.textContent = val;
+        } else {
+            el.innerHTML = val;
+        }
+    });
+}
+
+// ─── Build Trial Matrix ──────────────────────────────────────
+function buildTrials() {
+    const gains  = [100, 200, 300, 400];
+    const losses = [100, 200, 300, 400];
+    const matrix = [];
+    for (const g of gains) {
+        for (const l of losses) {
+            matrix.push({
+                gain: g,
+                loss: l,
+                // Randomization 2: swap gain/loss box positions?
+                swapBoxes: Math.random() < 0.5,
+                // Randomization 3: swap Accept/Reject button order?
+                swapButtons: Math.random() < 0.5
+            });
+        }
+    }
+    // Randomization 1: shuffle trial order
+    shuffle(matrix);
+    return matrix;
+}
+
+// ─── Start Trials ─────────────────────────────────────────────
+function startTrials() {
+    trials       = buildTrials();
+    trialResults = [];
+    currentTrial = 0;
+    showScreen('screen-trial');
+    renderTrial();
+}
+
+// ─── Render a single trial ────────────────────────────────────
+function renderTrial() {
+    const trial = trials[currentTrial];
+
+    // Progress dots
+    const dotsContainer = document.getElementById('progress-dots');
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < 16; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        if (i < currentTrial)  dot.classList.add('completed');
+        if (i === currentTrial) dot.classList.add('current');
+        dotsContainer.appendChild(dot);
+    }
+
+    // Trial label
+    document.getElementById('trial-label').textContent =
+        t('trial_label').replace('{n}', currentTrial + 1);
+
+    // Scenario text
+    document.getElementById('scenario-text').innerHTML = t('scenario_text');
+
+    // Outcome boxes (gain & loss) — order randomised
+    const gainBox = `
+        <div class="outcome-box gain">
+            <div class="coin-icon">🪙</div>
+            <p class="outcome-label">${t('gain_label')}</p>
+            <p class="outcome-amount">+ ₹${trial.gain.toLocaleString('en-IN')}</p>
+        </div>`;
+    const lossBox = `
+        <div class="outcome-box loss">
+            <div class="coin-icon">🪙</div>
+            <p class="outcome-label">${t('loss_label')}</p>
+            <p class="outcome-amount">− ₹${trial.loss.toLocaleString('en-IN')}</p>
+        </div>`;
+
+    document.getElementById('outcome-row').innerHTML =
+        trial.swapBoxes ? (lossBox + gainBox) : (gainBox + lossBox);
+
+    // Accept / Reject buttons — order randomised
+    const acceptBtn = `<button class="btn btn-accept" onclick="recordResponse('accept')">${t('btn_accept')}</button>`;
+    const rejectBtn = `<button class="btn btn-reject" onclick="recordResponse('reject')">${t('btn_reject')}</button>`;
+
+    document.getElementById('btn-row').innerHTML =
+        trial.swapButtons ? (rejectBtn + acceptBtn) : (acceptBtn + rejectBtn);
+
+    // Start reaction-time clock
+    trialStartTs = performance.now();
+}
+
+// ─── Record Response ──────────────────────────────────────────
+function recordResponse(response) {
+    const rt    = Math.round(performance.now() - trialStartTs);
+    const trial = trials[currentTrial];
+
+    trialResults.push({
+        participantId:  participantId,
+        trialNumber:    currentTrial + 1,
+        gainAmount:     trial.gain,
+        lossAmount:     trial.loss,
+        gainLossRatio:  +(trial.gain / trial.loss).toFixed(3),
+        response:       response,        // "accept" or "reject"
+        reactionTimeMs: rt,
+        boxOrder:       trial.swapBoxes   ? 'loss-first' : 'gain-first',
+        buttonOrder:    trial.swapButtons ? 'reject-first' : 'accept-first'
+    });
+
+    currentTrial++;
+    if (currentTrial < 16) {
+        showScreen('screen-trial');
+        renderTrial();
+    } else {
+        showScreen('screen-demographics');
+    }
+}
+
+// ─── Demographics Validation & Submit ─────────────────────────
+function submitDemographics() {
+    let valid = true;
+
+    const age    = document.getElementById('input-age').value.trim();
+    const gender = document.getElementById('input-gender').value;
+    const income = document.getElementById('input-income').value;
+
+    // Reset errors
+    document.querySelectorAll('.error-msg').forEach(e => e.style.display = 'none');
+
+    if (!age || isNaN(age) || +age < 10 || +age > 100) {
+        document.getElementById('err-age').style.display = 'block';
+        valid = false;
+    }
+    if (!gender) {
+        document.getElementById('err-gender').style.display = 'block';
+        valid = false;
+    }
+    if (!income) {
+        document.getElementById('err-income').style.display = 'block';
+        valid = false;
+    }
+    if (!valid) return;
+
+    const demographics = { age: +age, gender, income };
+    const lambda       = calculateLambda(trialResults);
+    displayResults(lambda);
+    sendData(trialResults, demographics, lambda);
+}
+
+// ─── λ Calculation (Logistic Regression) ────────────────────────
+/**
+ * calculateLambda — estimate Loss Aversion Coefficient (λ) via
+ * logistic regression on all 16 trial responses.
+ *
+ * ── Model ──
+ * P(accept) = sigmoid(β₀ + β_gain × Gain + β_loss × Loss)
+ *
+ * Where β_gain > 0 (more gain → more likely to accept) and
+ * β_loss < 0 (more loss → less likely to accept).
+ *
+ * ── Lambda formula (from Prospect Theory) ──
+ * λ = -(β_loss / β_gain)
+ *
+ * A λ of 2 means losses are felt 2× as strongly as equivalent gains.
+ *
+ * ── Implementation ──
+ * Features are normalised to [0,1] (both gain and loss share the
+ * same scale: 100–400), so the ratio λ = -(β_loss / β_gain) is
+ * preserved after normalisation.
+ * Gradient descent runs for 3 000 iterations with lr = 0.1.
+ *
+ * ── Edge cases ──
+ * • All accept / all reject → logistic regression is undefined;
+ *   we return 1.0 (neutral) or 5.0 (maximum) respectively.
+ * • β_gain ≈ 0 → degenerate response pattern; return midpoint 2.5.
+ *
+ * @param  {Array}  results — array of trial-result objects
+ * @return {number} estimated λ, rounded to 2 decimals
+ */
+function calculateLambda(results) {
+    const y = results.map(r => r.response === 'accept' ? 1 : 0);
+
+    // Guard: complete separation
+    if (y.every(v => v === 1)) return 1.0;
+    if (y.every(v => v === 0)) return 5.0;
+
+    // Normalise features to [0,1] (range 100–400, span = 300)
+    // Using identical scaling for gain and loss preserves the λ ratio.
+    const MIN_VAL = 100, SPAN = 300;
+    const X = results.map(r => [
+        (r.gainAmount - MIN_VAL) / SPAN,   // x1: normalised gain
+        (r.lossAmount - MIN_VAL) / SPAN    // x2: normalised |loss|
+    ]);
+    const n = results.length;
+
+    // Numerically-stable sigmoid
+    function sigmoid(z) {
+        const zc = Math.max(-30, Math.min(30, z));
+        return 1 / (1 + Math.exp(-zc));
+    }
+
+    // Parameters: [intercept, β_gain, β_loss]
+    let b = [0, 0, 0];
+    const LR = 0.1, ITERS = 3000;
+
+    for (let t = 0; t < ITERS; t++) {
+        const g = [0, 0, 0];
+        for (let i = 0; i < n; i++) {
+            const p   = sigmoid(b[0] + b[1] * X[i][0] + b[2] * X[i][1]);
+            const err = p - y[i];
+            g[0] += err;              // ∂L/∂β₀
+            g[1] += err * X[i][0];   // ∂L/∂β_gain
+            g[2] += err * X[i][1];   // ∂L/∂β_loss
+        }
+        b[0] -= (LR / n) * g[0];
+        b[1] -= (LR / n) * g[1];
+        b[2] -= (LR / n) * g[2];
+    }
+
+    // λ = -(β_loss / β_gain)  [Kahneman-Tversky formula]
+    if (Math.abs(b[1]) < 1e-8) return 2.5;  // degenerate: β_gain ≈ 0
+
+    let lambda = -(b[2] / b[1]);
+    lambda = Math.max(0.5, Math.min(5.0, lambda));
+    return +lambda.toFixed(2);
+}
+
+// ─── Display Results ──────────────────────────────────────────
+function displayResults(lambda) {
+    document.getElementById('lambda-value').textContent = lambda + '×';
+    document.getElementById('lambda-inline').textContent = lambda;
+
+    // Choose interpretation bracket
+    let interpKey;
+    if      (lambda <= 1.0)  interpKey = 'interp_low';
+    else if (lambda <= 1.5)  interpKey = 'interp_mild';
+    else if (lambda <= 2.5)  interpKey = 'interp_moderate';
+    else if (lambda <= 3.5)  interpKey = 'interp_high';
+    else                     interpKey = 'interp_very_high';
+
+    document.getElementById('interpretation-text').innerHTML = t(interpKey);
+
+    showScreen('screen-results');
+}
+
+// ─── Data Export — Google Apps Script Placeholder ─────────────
+/**
+ * sendData — POST the complete experiment payload to a
+ * Google Apps Script Web App so it lands in a Google Sheet.
+ *
+ * HOW TO USE:
+ * 1. Create a Google Apps Script with a doPost(e) function
+ *    that parses e.postData.contents and writes to your Sheet.
+ * 2. Deploy as a Web App (Execute as: Me, Access: Anyone).
+ * 3. Paste the Web App URL below.
+ */
+function sendData(trialResults, demographics, lambda) {
+    const payload = {
+        participantId:  participantId,
+        language:       currentLang,
+        timestamp:      new Date().toISOString(),
+        lambda:         lambda,
+        demographics:   demographics,
+        trials:         trialResults
+    };
+
+    console.log('── Experiment Payload ──', JSON.stringify(payload, null, 2));
+
+    // ─── Replace this URL with your deployed Google Apps Script Web App URL ───
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzo9xpELBmYnjZ64CNLt0OjdR2piv3gCwDbepPge3VvZIqYm7KDvMsTEaBXGomI-Pc8_g/exec';
+
+    // Uncomment the block below once you have your URL:
+    fetch(GOOGLE_SCRIPT_URL, {
+        method:  'POST',
+        mode:    'no-cors',              // required for Apps Script
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+    })
+    .then(() => console.log('Data sent to Google Sheet successfully.'))
+    .catch(err => console.error('Error sending data:', err));
+}
+</script>
+
+</body>
+</html>
