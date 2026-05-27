@@ -1,4 +1,4 @@
-# Loss Aversion Experiment
+# Loss Aversion Task
 
 A simple guide to understanding how this experiment works, what data it collects, and how the result is calculated.
 
@@ -14,7 +14,7 @@ We capture this individual difference with a single number called **Lambda (λ)*
 
 ---
 
-## 2. How does the Experiment Work?
+## 2. How does the task Work?
 
 The participant faces **16 coin-toss gambles**, one at a time. For each gamble:
 
