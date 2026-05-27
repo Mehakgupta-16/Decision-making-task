@@ -19,6 +19,8 @@
             --blue-900: #0D47A1;
             --green:    #2E7D32;
             --red:      #C62828;
+            --white:    #FFE9C0;
+            --black:    #371A12;
             --gray-50:  #FAFAFA;
             --gray-100: #F5F5F5;
             --gray-300: #E0E0E0;
@@ -125,12 +127,12 @@
         .btn-primary:hover { background: var(--blue-800); }
 
         .btn-accept {
-            background: var(--green);
+            background: var(--white);
             color: #fff;
             box-shadow: 0 2px 8px rgba(46,125,50,.3);
         }
         .btn-reject {
-            background: var(--red);
+            background: var(--white);
             color: #fff;
             box-shadow: 0 2px 8px rgba(198,40,40,.3);
         }
@@ -219,15 +221,15 @@
             letter-spacing: .5px;
             margin-bottom: 6px;
         }
-        .gain .outcome-label { color: var(--green); }
-        .loss .outcome-label { color: var(--red); }
+        .gain .outcome-label { color: var(--black); }
+        .loss .outcome-label { color: var(--black); }
 
         .outcome-amount {
             font-size: 1.5rem;
             font-weight: 700;
         }
-        .gain .outcome-amount { color: var(--green); }
-        .loss .outcome-amount { color: var(--red); }
+        .gain .outcome-amount { color: var(--black); }
+        .loss .outcome-amount { color: var(--black); }
 
         .coin-icon {
             font-size: 1.3rem;
