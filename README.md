@@ -1,4 +1,4 @@
-# Loss Aversion Task
+# Decision-making Task
 
 A simple guide to understanding how this experiment works, what data it collects, and how the result is calculated.
 
