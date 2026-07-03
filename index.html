@@ -348,6 +348,43 @@
         <p class="footer-note">Your data is anonymous and used for research only.</p>
     </div>
 
+    <!-- ═══════ SCREEN 1b — Study Information (Page 1) ═══════ -->
+    <div id="screen-info" class="screen">
+        <div class="card">
+            <h1 data-i18n="info_title">Study Information</h1>
+            <p data-i18n="info_body" style="white-space:pre-line;"></p>
+            <div class="result-interpretation" style="margin-top:20px;">
+                <p data-i18n="info_contact" style="white-space:pre-line;"></p>
+            </div>
+        </div>
+        <div class="mt-auto" style="padding-bottom:16px;">
+            <button class="btn btn-primary" onclick="showScreen('screen-consent')" data-i18n="info_continue">Continue</button>
+        </div>
+    </div>
+
+    <!-- ═══════ SCREEN 1c — Consent (Page 2) ═══════ -->
+    <div id="screen-consent" class="screen">
+        <div class="card">
+            <h1 data-i18n="consent_title">Consent</h1>
+            <p data-i18n="consent_body" style="white-space:pre-line;"></p>
+            <p data-i18n="consent_question" style="font-weight:600; color:var(--black); margin-top:20px; margin-bottom:4px;">I give my consent</p>
+            <div class="btn-row">
+                <button class="btn btn-accept" onclick="giveConsent('yes')" data-i18n="consent_yes">Yes</button>
+                <button class="btn btn-reject" onclick="giveConsent('no')" data-i18n="consent_no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ SCREEN 1d — Consent Declined (End) ═══════ -->
+    <div id="screen-declined" class="screen">
+        <div class="spacer"></div>
+        <div class="card text-center">
+            <h1 data-i18n="declined_title">Thank You</h1>
+            <p data-i18n="declined_body"></p>
+        </div>
+        <div class="spacer"></div>
+    </div>
+
     <!-- ═══════ SCREEN 2 — Instructions ═══════ -->
     <div id="screen-instructions" class="screen">
         <div class="card">
@@ -418,15 +455,117 @@
             </div>
 
             <div class="form-group">
-                <label for="input-income" data-i18n="demo_income_label">Monthly Income</label>
-                <select id="input-income">
-                    <option value="" disabled selected data-i18n="demo_income_placeholder">Select…</option>
-                    <option value="<50k"        data-i18n="demo_income_1">&lt; ₹50,000</option>
-                    <option value="50k-1.5L"    data-i18n="demo_income_2">₹50,000 – ₹1,50,000</option>
-                    <option value="1.5L-3L"     data-i18n="demo_income_3">₹1,50,000 – ₹3,00,000</option>
-                    <option value=">3L"         data-i18n="demo_income_4">&gt; ₹3,00,000</option>
+                <label for="input-residence" data-i18n="demo_residence_label">What is your place of residence?</label>
+                <select id="input-residence">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="delhi" data-i18n="demo_residence_1">Delhi</option>
+                    <option value="alwar" data-i18n="demo_residence_2">Alwar</option>
+                    <option value="other" data-i18n="demo_residence_3">Other</option>
                 </select>
-                <span class="error-msg" id="err-income" data-i18n="demo_income_error">Please select your income range.</span>
+                <span class="error-msg" id="err-residence" data-i18n="demo_residence_error">Please select your place of residence.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-education" data-i18n="demo_edu_label">What is your education level?</label>
+                <select id="input-education">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="no-formal"   data-i18n="demo_edu_1">No formal schooling</option>
+                    <option value="class-5"     data-i18n="demo_edu_2">Schooling till class 5th or equivalent</option>
+                    <option value="class-8"     data-i18n="demo_edu_3">Schooling till class 8th or equivalent</option>
+                    <option value="class-10"    data-i18n="demo_edu_4">Schooling till class 10th or equivalent</option>
+                    <option value="class-12"    data-i18n="demo_edu_5">Schooling till class 12th or equivalent</option>
+                    <option value="undergrad"   data-i18n="demo_edu_6">Formal education till under-graduation or equivalent</option>
+                    <option value="postgrad"    data-i18n="demo_edu_7">Formal education even after under-graduation</option>
+                </select>
+                <span class="error-msg" id="err-education" data-i18n="demo_edu_error">Please select your education level.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-occupation" data-i18n="demo_occ_label">What occupational category do you belong to?</label>
+                <select id="input-occupation">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="studying"    data-i18n="demo_occ_1">Studying</option>
+                    <option value="working"     data-i18n="demo_occ_2">Working</option>
+                    <option value="non-working" data-i18n="demo_occ_3">Non-working</option>
+                </select>
+                <span class="error-msg" id="err-occupation" data-i18n="demo_occ_error">Please select your occupational category.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-married" data-i18n="demo_married_label">Are you married?</label>
+                <select id="input-married">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="yes" data-i18n="demo_opt_yes">Yes</option>
+                    <option value="no"  data-i18n="demo_opt_no">No</option>
+                </select>
+                <span class="error-msg" id="err-married" data-i18n="demo_married_error">Please answer this question.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-earn" data-i18n="demo_earn_label">Do you yourself earn?</label>
+                <select id="input-earn">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="yes" data-i18n="demo_opt_yes">Yes</option>
+                    <option value="no"  data-i18n="demo_opt_no">No</option>
+                </select>
+                <span class="error-msg" id="err-earn" data-i18n="demo_earn_error">Please answer this question.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-selfincome" data-i18n="demo_selfincome_label">How much is your monthly self-income?</label>
+                <select id="input-selfincome">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="<50k"     data-i18n="demo_income_1">&lt; ₹50,000</option>
+                    <option value="50k-1.5L" data-i18n="demo_income_2">₹50,000 – ₹1,50,000</option>
+                    <option value="1.5L-3L"  data-i18n="demo_income_3">₹1,50,000 – ₹3,00,000</option>
+                    <option value=">3L"      data-i18n="demo_income_4">&gt; ₹3,00,000</option>
+                </select>
+                <span class="error-msg" id="err-selfincome" data-i18n="demo_selfincome_error">Please select your monthly self-income.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-hhincome" data-i18n="demo_hhincome_label">How much is your monthly household income?</label>
+                <select id="input-hhincome">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="<50k"     data-i18n="demo_income_1">&lt; ₹50,000</option>
+                    <option value="50k-1.5L" data-i18n="demo_income_2">₹50,000 – ₹1,50,000</option>
+                    <option value="1.5L-3L"  data-i18n="demo_income_3">₹1,50,000 – ₹3,00,000</option>
+                    <option value=">3L"      data-i18n="demo_income_4">&gt; ₹3,00,000</option>
+                </select>
+                <span class="error-msg" id="err-hhincome" data-i18n="demo_hhincome_error">Please select your monthly household income.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-saveregular" data-i18n="demo_saveregular_label">Do you save regularly?</label>
+                <select id="input-saveregular">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="yes" data-i18n="demo_opt_yes">Yes</option>
+                    <option value="no"  data-i18n="demo_opt_no">No</option>
+                </select>
+                <span class="error-msg" id="err-saveregular" data-i18n="demo_saveregular_error">Please answer this question.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-savesatisfy" data-i18n="demo_savesatisfy_label">According to you, are you able to save satisfactorily?</label>
+                <select id="input-savesatisfy">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="yes" data-i18n="demo_opt_yes">Yes</option>
+                    <option value="no"  data-i18n="demo_opt_no">No</option>
+                </select>
+                <span class="error-msg" id="err-savesatisfy" data-i18n="demo_savesatisfy_error">Please answer this question.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="input-savegoal" data-i18n="demo_savegoal_label">Under a scenario where you have surplus income, what is the likelihood of you setting saving-related goals?</label>
+                <select id="input-savegoal">
+                    <option value="" disabled selected data-i18n="demo_select_placeholder">Select…</option>
+                    <option value="none"     data-i18n="demo_savegoal_1">No likelihood at all</option>
+                    <option value="slight"   data-i18n="demo_savegoal_2">Slight likelihood</option>
+                    <option value="moderate" data-i18n="demo_savegoal_3">Moderate likelihood</option>
+                    <option value="strong"   data-i18n="demo_savegoal_4">Strong likelihood</option>
+                    <option value="neither"  data-i18n="demo_savegoal_5">Neither likelihood nor unlikelihood</option>
+                </select>
+                <span class="error-msg" id="err-savegoal" data-i18n="demo_savegoal_error">Please select an option.</span>
             </div>
         </div>
         <div class="mt-auto" style="padding-bottom:16px;">
@@ -477,6 +616,17 @@ const LANG = {
         instructions_p4:        'There are no right or wrong answers. Please respond as quickly and honestly as you can.',
         instructions_p5:        'The task takes about <strong>2–3 minutes</strong>.',
         start_experiment:       "Begin the Task",
+        info_title:             "Study Information",
+        info_body:              "You are participating in a study that aims to understand your reaction to experiencing gains and losses. In this short questionnaire, you will be responding to set of statements. Please read the statements carefully. You have to tell how much in agreement or disagreement you are with them. There are a total of six statements. Please take your time, and respond introspectively. The task is expected to take less than 5 minutes.\n\nPlease note that the study does not pose any risk. We do not ask any sensitive information. We do not ask any identifying information. Your responses will be kept confidential and anonymous. Only the researcher will have access to your responses. Any data, when published, will be released after taking away any personal information. There is no provision of monetary compensation for your participation.",
+        info_contact:           "Researcher's contact details -\nPhD student at IITD\nemail id: huz238417@iitd.ac.in",
+        info_continue:          "Continue",
+        consent_title:          "Consent",
+        consent_body:           "I have been informed on the details of the study. I have read these details in the earlier page. These details are enlisted in the language that I understand. I confirm that I have understood these details of the study. I confirm that the earlier page mentioned the contact details of the researcher in case I need to reach out for more details. I confirm that I have understood about the compensation and the risks and benefits involved in this research. I understand that my participation in the study is voluntary and that I am free to withdraw at any time without giving any reason. I understand that confidentiality of my identity will be maintained during the research period, after its completion as well as during publication of the results. Only investigator, ethics committee, institutional or regulatory authorities may have access to my information when required. I volunteer to participate in the above-mentioned study.",
+        consent_question:       "I give my consent",
+        consent_yes:            "Yes",
+        consent_no:             "No",
+        declined_title:         "Thank You",
+        declined_body:          "Thank you for your time. You have chosen not to participate. You may now close this page.",
         scenario_text:          "A fair coin is tossed. Do you accept this coin toss?",
         trial_label:            "Trial {n} of 16",
         gain_label:             "HEADS — YOU WIN",
@@ -484,7 +634,12 @@ const LANG = {
         btn_accept:             "Accept",
         btn_reject:             "Reject",
         demo_title:             "Almost Done!",
-        demo_subtitle:          "Please tell us a little about yourself.",
+        demo_subtitle:          "We want to know a little about you. Please note that no identifying information is being asked. Your responses will remain anonymous.",
+        demo_residence_label:   "What is your place of residence?",
+        demo_residence_1:       "Delhi",
+        demo_residence_2:       "Alwar",
+        demo_residence_3:       "Other",
+        demo_residence_error:   "Please select your place of residence.",
         demo_age_label:         "Age",
         demo_age_error:         "Please enter a valid age (10–100).",
         demo_gender_label:      "Gender",
@@ -500,6 +655,42 @@ const LANG = {
         demo_income_3:          "₹1,50,000 – ₹3,00,000",
         demo_income_4:          "> ₹3,00,000",
         demo_income_error:      "Please select your income range.",
+        demo_select_placeholder:"Select…",
+        demo_opt_yes:           "Yes",
+        demo_opt_no:            "No",
+        demo_edu_label:         "What is your education level?",
+        demo_edu_1:             "No formal schooling",
+        demo_edu_2:             "Schooling till class 5th or equivalent",
+        demo_edu_3:             "Schooling till class 8th or equivalent",
+        demo_edu_4:             "Schooling till class 10th or equivalent",
+        demo_edu_5:             "Schooling till class 12th or equivalent",
+        demo_edu_6:             "Formal education till under-graduation or equivalent",
+        demo_edu_7:             "Formal education even after under-graduation",
+        demo_edu_error:         "Please select your education level.",
+        demo_occ_label:         "What occupational category do you belong to?",
+        demo_occ_1:             "Studying",
+        demo_occ_2:             "Working",
+        demo_occ_3:             "Non-working",
+        demo_occ_error:         "Please select your occupational category.",
+        demo_married_label:     "Are you married?",
+        demo_married_error:     "Please answer this question.",
+        demo_earn_label:        "Do you yourself earn?",
+        demo_earn_error:        "Please answer this question.",
+        demo_selfincome_label:  "How much is your monthly self-income?",
+        demo_selfincome_error:  "Please select your monthly self-income.",
+        demo_hhincome_label:    "How much is your monthly household income?",
+        demo_hhincome_error:    "Please select your monthly household income.",
+        demo_saveregular_label: "Do you save regularly?",
+        demo_saveregular_error: "Please answer this question.",
+        demo_savesatisfy_label: "According to you, are you able to save satisfactorily?",
+        demo_savesatisfy_error: "Please answer this question.",
+        demo_savegoal_label:    "Under a scenario where you have surplus income, what is the likelihood of you setting saving-related goals?",
+        demo_savegoal_1:        "No likelihood at all",
+        demo_savegoal_2:        "Slight likelihood",
+        demo_savegoal_3:        "Moderate likelihood",
+        demo_savegoal_4:        "Strong likelihood",
+        demo_savegoal_5:        "Neither likelihood nor unlikelihood",
+        demo_savegoal_error:    "Please select an option.",
         demo_pid_label:          "Participant ID",
         demo_pid_placeholder:   "Enter your participant ID",
         demo_submit:            "Submit",
@@ -526,6 +717,17 @@ const LANG = {
         instructions_p4:        'कोई सही या गलत उत्तर नहीं है। हमें आपकी <strong>सहज भावना</strong> में रुचि है — कृपया जितनी जल्दी और ईमानदारी से हो सके उत्तर दें।',
         instructions_p5:        'प्रयोग में लगभग <strong>2-3 मिनट</strong> लगते हैं।',
         start_experiment:       "प्रयोग शुरू करें",
+        info_title:             "अध्ययन की जानकारी",
+        info_body:              "आप एक ऐसे अध्ययन में भाग ले रहे हैं जिसका उद्देश्य लाभ और हानि के प्रति आपकी सोच को समझना है। इसमें आपको कुछ वाक्य का उत्तर देना होगा। कृपया वाक्य को ध्यानपूर्वक पढ़ें। आपको यह बताना है कि आप उनसे कितना सहमत या असहमत हैं। कुल छह (6) कथन हैं। कृपया समय लें और आत्मनिरीक्षण (सोच-विचार) करते हुए उत्तर दें। इस कार्य को पूरा करने में 5 मिनट से कम समय लगने की उम्मीद है।\n\nकृपया ध्यान दें कि इस अध्ययन से कोई जोखिम नहीं है। हम आपसे आपकी पहचान से जुड़ी कोई भी जानकारी नहीं मांग रहे हैं। आपके जवाब गोपनीय और गुमनाम रखे जाएंगे। केवल शोधकर्ता ही आपकी जवाब को देख सकेंगे। प्रकाशित होने पर, सभी व्यक्तिगत जानकारी हटाकर ही डेटा जारी किया जाएगा। आपकी भागीदारी के लिए किसी प्रकार का मौद्रिक (पैसे से संबंधित) मुआवजा नहीं दिया जाएगा।",
+        info_contact:           "शोधकर्ता के संपर्क विवरण -\nIITD में पीएचडी छात्र\nईमेल आईडी: huz238417@iitd.ac.in",
+        info_continue:          "आगे बढ़ें",
+        consent_title:          "सहमति",
+        consent_body:           "मुझे अध्ययन के जानकारी के बारे में सूचित कर दिया गया है। मैंने ये जानकारी पिछले पृष्ठ पर पढ़ लिए हैं। ये जानकारी उस भाषा में दिए गए हैं जिसे मैं समझता/समझती हूँ। मैं पुष्टि करता/करती हूँ कि मैंने अध्ययन के इन जानकारी को समझ लिया है। मैं पुष्टि करता/करती हूँ कि पिछले पृष्ठ पर शोधकर्ता के संपर्क विवरण दिए गए हैं ताकि अधिक जानकारी प्राप्त करने के लिए मैं उनसे संपर्क कर सकूँ। मैं पुष्टि करता/करती हूँ कि मैंने इस शोध में शामिल मुआवजे और जोखिमों एवं लाभों को समझ लिया है। मैं समझता/समझती हूँ कि अध्ययन में मेरी भागीदारी स्वैच्छिक है और मैं बिना कोई कारण बताए किसी भी समय इससे हट सकता/सकती हूँ। मैं समझता/समझती हूँ कि कार्य के दौरान, इसके पूरा होने के बाद और परिणामों के प्रकाशन के दौरान मेरी पहचान की गोपनीयता बनाए रखी जाएगी। आवश्यकता पड़ने पर केवल अन्वेषक, नैतिकता समिति, संस्थागत प्राधिकरणों को ही डेटा उपलब्ध कराया जाएगा। मैं उपर्युक्त अध्ययन में स्वेच्छा से भाग लेता/लेती हूँ।",
+        consent_question:       "मैं अपनी सहमति देता/देती हूँ",
+        consent_yes:            "हां",
+        consent_no:             "नहीं",
+        declined_title:         "धन्यवाद",
+        declined_body:          "आपके समय के लिए धन्यवाद। आपने भाग न लेने का विकल्प चुना है। अब आप इस पेज को बंद कर सकते हैं।",
         scenario_text:          "एक निष्पक्ष सिक्का उछाला जाता है। क्या आप इस जुए को स्वीकार करते हैं?",
         trial_label:            "परीक्षण {n} / 16",
         gain_label:             "चित — आप जीतते हैं",
@@ -533,7 +735,12 @@ const LANG = {
         btn_accept:             "स्वीकार",
         btn_reject:             "अस्वीकार",
         demo_title:             "लगभग हो गया!",
-        demo_subtitle:          "कृपया अपने बारे में थोड़ा बताएं।",
+        demo_subtitle:          "हम आपके बारे में कुछ जानना चाहते हैं। कृपया ध्यान दें कि आपसे कोई भी पहचान संबंधी जानकारी नहीं मांगी जा रही है। आपके जवाब गोपनीय रहेंगे।",
+        demo_residence_label:   "आप कहाँ रहते हैं?",
+        demo_residence_1:       "दिल्ली",
+        demo_residence_2:       "अलवर",
+        demo_residence_3:       "कुछ और",
+        demo_residence_error:   "कृपया अपना निवास स्थान चुनें।",
         demo_age_label:         "आयु",
         demo_age_error:         "कृपया एक मान्य आयु दर्ज करें (10–100)।",
         demo_gender_label:      "लिंग",
@@ -549,6 +756,42 @@ const LANG = {
         demo_income_3:          "₹1,50,000 – ₹3,00,000",
         demo_income_4:          "> ₹3,00,000",
         demo_income_error:      "कृपया अपनी आय सीमा चुनें।",
+        demo_select_placeholder:"चुनें…",
+        demo_opt_yes:           "हाँ",
+        demo_opt_no:            "नहीं",
+        demo_edu_label:         "आपकी शिक्षा का स्तर क्या है?",
+        demo_edu_1:             "कोई औपचारिक स्कूली शिक्षा नहीं",
+        demo_edu_2:             "कक्षा 5वीं या समकक्ष तक पूरी की गई स्कूली शिक्षा",
+        demo_edu_3:             "कक्षा 8वीं या समकक्ष तक पूरी की गई स्कूली शिक्षा",
+        demo_edu_4:             "कक्षा 10वीं या समकक्ष तक पूरी की गई स्कूली शिक्षा",
+        demo_edu_5:             "कक्षा 12वीं या समकक्ष तक पूरी की गई स्कूली शिक्षा",
+        demo_edu_6:             "कॉलेज की डिग्री या समकक्ष तक पूरी की गई शिक्षा",
+        demo_edu_7:             "कॉलेज के बाद तक पूरी की गई शिक्षा",
+        demo_edu_error:         "कृपया अपनी शिक्षा का स्तर चुनें।",
+        demo_occ_label:         "आप किस व्यावसायिक श्रेणी में आते हैं?",
+        demo_occ_1:             "विद्यार्थी",
+        demo_occ_2:             "कामकाजी",
+        demo_occ_3:             "काम नहीं कर रहे",
+        demo_occ_error:         "कृपया अपनी व्यावसायिक श्रेणी चुनें।",
+        demo_married_label:     "क्या आप शादीशुदा हैं?",
+        demo_married_error:     "कृपया इस प्रश्न का उत्तर दें।",
+        demo_earn_label:        "क्या आप खुद कमाते हैं?",
+        demo_earn_error:        "कृपया इस प्रश्न का उत्तर दें।",
+        demo_selfincome_label:  "आपकी महीने की आमदनी कितनी है?",
+        demo_selfincome_error:  "कृपया अपनी मासिक आय चुनें।",
+        demo_hhincome_label:    "आपके परिवार की महीने की आमदनी कितनी है?",
+        demo_hhincome_error:    "कृपया अपने परिवार की मासिक आय चुनें।",
+        demo_saveregular_label: "क्या आप नियमित रूप से पैसे बचाते हैं?",
+        demo_saveregular_error: "कृपया इस प्रश्न का उत्तर दें।",
+        demo_savesatisfy_label: "आप के अनुसार, क्या आप जितना चाहते हैं उतनी बचत कर पाते हैं?",
+        demo_savesatisfy_error: "कृपया इस प्रश्न का उत्तर दें।",
+        demo_savegoal_label:    "अगर किसी स्थिति में आपके पास जरूरी से ज़्यादा पैसे हैं, तो आपकी पैसे बचाने का कोई लक्ष्य रखने की कितनी संभावना है?",
+        demo_savegoal_1:        "बिलकुल संभावना नहीं",
+        demo_savegoal_2:        "थोड़ी संभावना",
+        demo_savegoal_3:        "मध्यम संभावना",
+        demo_savegoal_4:        "अत्यधिक संभावना",
+        demo_savegoal_5:        "न तो संभावना और न ही असंभावना",
+        demo_savegoal_error:    "कृपया एक विकल्प चुनें।",
         demo_pid_label:          "प्रतिभागी आईडी",
         demo_pid_placeholder:   "अपनी प्रतिभागी आईडी दर्ज करें",
         demo_submit:            "जमा करें",
@@ -602,7 +845,19 @@ function setLanguage(lang) {
     currentLang = lang;
     document.documentElement.lang = lang === 'hi' ? 'hi' : 'en';
     applyTranslations();
-    showScreen('screen-instructions');
+    showScreen('screen-info');
+}
+
+// ─── Consent Gate ─────────────────────────────────────────────
+let consentGiven = null;
+function giveConsent(answer) {
+    consentGiven = answer;
+    if (answer === 'yes') {
+        showScreen('screen-instructions');
+    } else {
+        // Participant declined — the form ends here.
+        showScreen('screen-declined');
+    }
 }
 
 function applyTranslations() {
@@ -631,8 +886,9 @@ function buildTrials() {
                 loss: l,
                 // Randomization 2: swap gain/loss box positions?
                 swapBoxes: Math.random() < 0.5,
-                // Randomization 3: swap Accept/Reject button order?
-                swapButtons: Math.random() < 0.5
+                // Accept/Reject button order is kept constant (Accept left,
+                // Reject right) for every trial — no longer randomised.
+                swapButtons: false
             });
         }
     }
@@ -730,9 +986,18 @@ function recordResponse(response) {
 function submitDemographics() {
     let valid = true;
 
-    const age    = document.getElementById('input-age').value.trim();
-    const gender = document.getElementById('input-gender').value;
-    const income = document.getElementById('input-income').value;
+    const age         = document.getElementById('input-age').value.trim();
+    const gender      = document.getElementById('input-gender').value;
+    const residence   = document.getElementById('input-residence').value;
+    const education   = document.getElementById('input-education').value;
+    const occupation  = document.getElementById('input-occupation').value;
+    const married     = document.getElementById('input-married').value;
+    const earn        = document.getElementById('input-earn').value;
+    const selfIncome  = document.getElementById('input-selfincome').value;
+    const householdIncome = document.getElementById('input-hhincome').value;
+    const saveRegular = document.getElementById('input-saveregular').value;
+    const saveSatisfy = document.getElementById('input-savesatisfy').value;
+    const saveGoal    = document.getElementById('input-savegoal').value;
 
     // Reset errors
     document.querySelectorAll('.error-msg').forEach(e => e.style.display = 'none');
@@ -745,13 +1010,33 @@ function submitDemographics() {
         document.getElementById('err-gender').style.display = 'block';
         valid = false;
     }
-    if (!income) {
-        document.getElementById('err-income').style.display = 'block';
-        valid = false;
+
+    // All new demographic questions are required.
+    const requiredFields = [
+        ['residence',       'err-residence'],
+        ['education',       'err-education'],
+        ['occupation',      'err-occupation'],
+        ['married',         'err-married'],
+        ['earn',            'err-earn'],
+        ['selfIncome',      'err-selfincome'],
+        ['householdIncome', 'err-hhincome'],
+        ['saveRegular',     'err-saveregular'],
+        ['saveSatisfy',     'err-savesatisfy'],
+        ['saveGoal',        'err-savegoal']
+    ];
+    const values = { residence, education, occupation, married, earn, selfIncome, householdIncome, saveRegular, saveSatisfy, saveGoal };
+    for (const [field, errId] of requiredFields) {
+        if (!values[field]) {
+            document.getElementById(errId).style.display = 'block';
+            valid = false;
+        }
     }
     if (!valid) return;
 
-    const demographics = { age: +age, gender, income };
+    const demographics = {
+        age: +age, gender, residence, education, occupation, married, earn,
+        selfIncome, householdIncome, saveRegular, saveSatisfy, saveGoal
+    };
     const lambda       = calculateLambda(trialResults);
     displayResults(lambda);
     sendData(trialResults, demographics, lambda);
@@ -869,6 +1154,7 @@ function sendData(trialResults, demographics, lambda) {
         participantId:  participantId,
         language:       currentLang,
         timestamp:      new Date().toISOString(),
+        consent:        consentGiven,
         lambda:         lambda,
         demographics:   demographics,
         trials:         trialResults
