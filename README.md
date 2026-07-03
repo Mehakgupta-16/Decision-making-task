@@ -39,20 +39,48 @@ The order of trials is **randomised** for every participant so that patterns can
 ## 3. Application Flow (Screen by Screen)
 
 1. **Language Selection** — Participant chooses English or Hindi.
-2. **Instructions** — Explains the coin-toss task. Participant clicks "Start Experiment".
-3. **16 Trials** — Each gamble is shown one at a time. A dot-based progress bar at the top shows how many trials remain. The position of Gain/Loss boxes and Accept/Reject buttons is randomly swapped each trial to prevent response-side bias.
-4. **Demographics** — Participant enters their Age, Gender, and Monthly Income. A unique Participant ID is auto-generated in the background.
-5. **Results** — The participant's personal λ is displayed along with an interpretation of what the score means.
+2. **Study Information (Page 1)** — Describes the study, confidentiality, no monetary compensation, and the researcher's contact details.
+3. **Consent (Page 2)** — Full consent statement with a **Yes / No** choice. Choosing **No** ends the session on a Thank You screen; only **Yes** continues.
+4. **Instructions** — Explains the coin-toss task. Participant clicks "Start Experiment".
+5. **16 Trials** — Each gamble is shown one at a time. A dot-based progress bar at the top shows how many trials remain. The Gain/Loss box positions are randomly swapped each trial to prevent side bias; the Accept/Reject buttons are kept in a **constant** position (Accept left, Reject right).
+6. **Demographics** — Participant answers a set of questions (see §4). A unique Participant ID is auto-generated in the background.
+7. **Results** — The participant's personal λ is displayed along with an interpretation of what the score means.
 
 ---
 
 ## 4. What Data is Collected?
 
-For each of the 16 trials, the app silently records:
+**Per participant** (session-level, recorded once):
 
 | Field | Description |
 |---|---|
 | `participantId` | Auto-generated unique ID (timestamp + random string) |
+| `timestamp` | ISO timestamp of submission |
+| `language` | `"en"` or `"hi"` |
+| `consent` | `"yes"` or `"no"` |
+| `lambda` | Computed loss-aversion coefficient (λ) |
+
+**Demographics** (recorded once, repeated on each trial row):
+
+| Field | Description |
+|---|---|
+| `age` | Participant age |
+| `gender` | `male` / `female` / `other` |
+| `residence` | `delhi` / `alwar` / `other` |
+| `education` | Highest education level |
+| `occupation` | `studying` / `working` / `non-working` |
+| `married` | `yes` / `no` |
+| `earn` | Whether the participant earns — `yes` / `no` |
+| `selfIncome` | Monthly self-income bracket |
+| `householdIncome` | Monthly household income bracket |
+| `saveRegular` | Saves regularly — `yes` / `no` |
+| `saveSatisfy` | Able to save satisfactorily — `yes` / `no` |
+| `saveGoal` | Likelihood of setting saving goals with surplus income |
+
+**Per trial** (16 rows per participant):
+
+| Field | Description |
+|---|---|
 | `trialNumber` | 1–16 |
 | `gainAmount` | ₹100, ₹200, ₹300, or ₹400 |
 | `lossAmount` | ₹100, ₹200, ₹300, or ₹400 |
@@ -60,9 +88,9 @@ For each of the 16 trials, the app silently records:
 | `response` | `"accept"` or `"reject"` |
 | `reactionTimeMs` | Milliseconds from trial display to button click |
 | `boxOrder` | Whether Gain or Loss box appeared on the left |
-| `buttonOrder` | Whether Accept or Reject appeared on the left |
+| `buttonOrder` | Button side (constant — always `accept-first`) |
 
-All 16 trial rows plus demographic information are sent together to a **Google Sheet** via a Google Apps Script Web App when the participant submits the Demographics form.
+All 16 trial rows (each carrying the session + demographic columns) are sent together to a **Google Sheet** via a Google Apps Script Web App when the participant submits the Demographics form. The script that receives this data is in [`apps-script.gs`](apps-script.gs).
 
 ---
 
